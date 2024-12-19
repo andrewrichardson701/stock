@@ -663,7 +663,7 @@ include 'includes/responsehandling.inc.php'; // Used to manage the error / succe
                     <tbody>
                         <tr>
                             <td class="align-middle" style="margin-left:25px;margin-right:10px">
-                                <p style="min-height:max-content;margin:0px" class="align-middle">Self sign up allowed:</p>
+                                <p style="min-height:max-content;margin:0px" class="align-middle title" title="Enable the signup.php self sign up page for locally authenticated users">Self sign up allowed:</p>
                             </td>
                             <td class="align-middle" style="padding-left:5px;padding-right:50px" id="signup_allowed_toggle">
                                 <label class="switch align-middle" style="margin-bottom:0px;margin-top:3px" >
@@ -1981,9 +1981,9 @@ include 'includes/responsehandling.inc.php'; // Used to manage the error / succe
                     $result_stock = mysqli_stmt_get_result($stmt_stock);
                     $rowCount_stock = $result_stock->num_rows;
                     if ($rowCount_stock !== 0) {
-                        echo('<p class="margin-left:10px">Count: <or class="green">'.$rowCount_stock.'</or></p>');
                         ?>
                         <div style="max-height:60vh;overflow-x: hidden;overflow-y: auto; margin-left:10px; margin-right:10px">
+                        <?php echo('<p class="margin-left:10px">Count: <or class="green">'.$rowCount_stock.'</or></p>'); ?>
                             <table class="table table-dark theme-table" style="max-width:max-content">
                                 <thead>
                                     <tr class="theme-tableOuter">

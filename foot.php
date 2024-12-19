@@ -22,7 +22,7 @@ $WorB_complement_banner_color = getWorB($complemenent_banner_color);
 </style>
 <div id="scrollTop" class="hideTranslate">
     <button onclick="topFunction()" class="scrollBtn" id="scrollBtn" title="Go to top.">
-        <i class="fa fa-chevron-up scrollIcon"></i> <span id="scrollText">Scroll to Top</span>
+        <i class="fa fa-chevron-up scrollIcon"></i> &nbsp;<span id="scrollText">Scroll to Top</span>
     </button>
 </div>
 
@@ -49,7 +49,7 @@ if ($current_footer_enable == 1) {
                 <div class="col text-center viewport-large-empty">
                     <?php
                     if ($current_footer_right_enable == 1) {
-                        echo('<a href="https://todo.ajrich.co.uk/#/board/16" class="link" style="font-size:12px" target="_blank">Road Map</a>');
+                        echo('<a href="https://gitlab.com/andrewrichardson701/stockbase#roadmap" class="link" style="font-size:12px" target="_blank">Road Map</a>');
                     }
                     ?>
                 </div>
@@ -64,7 +64,7 @@ if ($current_footer_enable == 1) {
         
     </div>
     <?php 
-    if (isset($_SESSION['user_id']) && $_SESSION['role'] == 'Admin') {
+    if (isset($_SESSION['user_id']) && ($_SESSION['role'] == 'Admin' || $_SESSION['role'] == 'Root')) {
         echo('<span id="version-check" class="popupBox well-nopad text-center theme-divBg">');
             if (isset($update_text)) { echo($update_text); } else { echo('Unable to check for updates.'); }
         echo('</span>');

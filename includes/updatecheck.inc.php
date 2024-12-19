@@ -4,7 +4,7 @@
 // StockBase is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License along with StockBase. If not, see <https://www.gnu.org/licenses/>.
 
-if (isset($_SESSION['user_id']) && $_SESSION['role'] == 'Admin') {
+if (isset($_SESSION['user_id']) && ($_SESSION['role'] == 'Admin' || $_SESSION['role'] == 'Root')) {
     $update_check = checkUpdates($versionNumber);
     $update_text = '';
 

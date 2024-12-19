@@ -153,18 +153,35 @@ include 'session.php'; // Session setup and redirect if the session is not activ
 
     <div style="margin-bottom:75px;margin-left:20px;margin-right:20px">
         <?php 
+        // Pagination variables
+        $results_per_page = 50;
+        $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+        $start_index = ($current_page - 1) * $results_per_page;
+
         include 'includes/dbh.inc.php';
-        $sql = "SELECT * 
+        $sql_pre = "SELECT * 
                 FROM changelog 
-                WHERE changelog.timestamp >= '$changelog_start_date_time' 
-                    AND changelog.timestamp <= '$changelog_end_date_time'
+                WHERE changelog.timestamp >= ? 
+                    AND changelog.timestamp <= ?
                     $changelog_table
                     $changelog_user
                 ORDER BY id DESC, timestamp DESC";
+        $sql = $sql_pre." LIMIT ?, ?";
+
+        $stmt_count = mysqli_stmt_init($conn);
+        if (mysqli_stmt_prepare($stmt_count, $sql_pre)) {
+            mysqli_stmt_bind_param($stmt_count, "ss", $changelog_start_date_time, $changelog_end_date_time);
+            mysqli_stmt_execute($stmt_count);
+            $result_count = mysqli_stmt_get_result($stmt_count);
+            $row_count = $result_count->num_rows;
+            $total_pages = ceil($row_count / $results_per_page);
+        }
+
         $stmt = mysqli_stmt_init($conn);
         if (!mysqli_stmt_prepare($stmt, $sql)) {
             echo("<p class='red'>Error reaching changelog table</p>");
         } else {
+            mysqli_stmt_bind_param($stmt, "ssii", $changelog_start_date_time, $changelog_end_date_time, $start_index, $results_per_page);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
             $rowCount = $result->num_rows;
@@ -175,6 +192,7 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                 <pre hidden>
                     <?php echo($sql); ?>
                 </pre>
+                <p class="container" style="margin-top:40px">Entry count: <or class="green"><?php echo($row_count); ?></or></p>
                 <table id="changelogTable" class="table table-dark theme-table centertable" style="max-width:max-content">
                     <thead>
                         <tr class="theme-tableOuter align-middle text-center">
@@ -311,6 +329,65 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                 <?php
             }
         }
+        if ($total_pages !== NULL && $total_pages > 1) {
+            if ( $total_pages > 1 && $total_pages <= 15){
+                echo '<div class="container" style="text-align: center;">';
+                if ($current_page > 1) {
+                    echo '<or class="gold clickable" style="padding-right:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.($current_page - 1).'\') + \'\')"><</or>';
+                }
+                if ($total_pages > 5) {
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        if ($i == $current_page) {
+                            echo '<span class="current-page pageSelected" style="padding-right:2px;padding-left:2px">' . $i . '</span>';
+                            // onclick="navPage(updateQueryParameter(\'\', \'page\', \'$i\'))"
+                        } elseif ($i == 1 && $current_page > 5) {
+                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or><or style="padding-left:5px;padding-right:5px">...</or>';  
+                        } elseif ($i < $current_page && $i >= $current_page-2) {
+                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';
+                        } elseif ($i > $current_page && $i <= $current_page+2) {
+                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';
+                        } elseif ($i == $total_pages) {
+                            echo '<or style="padding-left:5px;padding-right:5px">...</or><or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';  
+                        }
+                    }
+                } else {
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        if ($i == $current_page) {
+                            echo '<span class="current-page pageSelected" style="padding-right:2px;padding-left:2px">' . $i . '</span>';
+                            // onclick="navPage(updateQueryParameter(\'\', \'page\', \'$i\'))"
+                        } else {
+                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';
+                        }
+                    }
+                }
+            
+                if ($current_page < $total_pages) {
+                    echo '<or class="gold clickable" style="padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.($current_page + 1).'\') + \'\')">></or>';
+                }  
+                echo ('</div>');
+            } else {
+                echo ('
+                <form style="margin-bottom:0px">
+                    <table class="centertable">
+                        <tbody>
+                            <tr>
+                                <td style="padding-right:10px">Page:</td>
+                                <td style="padding-right:10px">
+                                    <select id="page-select" class="form-control row-dropdown" style="width:50px;height:25px; padding:0px" onchange="navPage(updateQueryParameter(\'\', \'page\', document.getElementById(\'page-select\').value + \'#transactions\'))" name="page">');
+                                    for ($i = 1; $i <= $total_pages; $i++) {
+                                        echo('<option value="'.$i.'"'); if ($i == $current_page) { echo(' selected'); } echo('>'.$i.'</option>');
+                                    }
+                                    echo('
+                                    </select>
+                                </td>
+                            <tr>
+                        </tbody>
+                    </table>        
+                </form>
+                ');
+            }
+        }
+
         ?>
     </div>
 

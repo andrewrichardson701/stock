@@ -732,7 +732,7 @@ img.stock-imageOther {
 #scrollTop {
     display: block;
     position: fixed;
-    bottom: 35px;
+    bottom: 40px;
     right: -100px;
     z-index: 99;
     font-size: 18px;
@@ -749,11 +749,12 @@ img.stock-imageOther {
     cursor: pointer;
     padding: 0px 10px 0px 10px;
     border-radius: 4px;
-    position: inline-block;
+    display: inline-block;
     width: 38px;
     height: 38px;
     transition: width 0.2s ease; /* Apply smooth width and position transitions */
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .scrollIcon {
@@ -1244,4 +1245,22 @@ meter::-webkit-meter-even-less-good-value { background: red; }
     transition: opacity 0.3s ease;
     white-space: nowrap;
     z-index: 9999;
+}
+
+#version-changelog h2 {
+    font-size:22px;
+}
+
+#version-changelog h3 {
+    font-size:12px;
+    font-weight:bold;
+}
+
+#version-changelog li{
+    font-size:10px;
+}
+
+.no-perms {
+    opacity:.5; 
+    cursor: not-allowed;
 }

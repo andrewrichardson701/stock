@@ -25,7 +25,7 @@ include 'session.php'; // Session setup and redirect if the session is not activ
     </script>
     <!-- Header and Nav -->
     <?php 
-        $navHighlight = 'optics'; // for colouring the nav bar link
+        $navHighlight = 'assets'; // for colouring the nav bar link
         $navBtnDim = 1;
         include 'nav.php'; 
     ?>

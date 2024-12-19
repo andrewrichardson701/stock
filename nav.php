@@ -24,7 +24,7 @@
                 case 'cables':
                     $highlight = 2;
                     break;
-                case 'optics':
+                case 'assets':
                     $highlight = 3;
                     break;
                 case 'containers':
@@ -103,14 +103,12 @@
                 
             }
             if (isset($loggedin_role)) {
-                if (in_array($loggedin_role, $config_optics_roles_array)) {
-                    $n = 3;
-                    echo('
-                    <div id="optics-div" class="'); if ($nav_right_set == 0) { echo('nav-right'); $nav_right_set = 1; } echo(' nav-div">
-                        <a id="optics" class="nav-v-c nav-trans" style="padding-left:6px;padding-right:6px;align-items:center;display:flex;height:100%;color:'.$current_banner_text_color.' !important;'); if ($highlight == $n) { echo('text-decoration: underline !important;'); }  echo('" href="./optics.php">Optics</a>
-                    </div> 
-                    ');
-                }
+                $n = 3;
+                echo('
+                <div id="assets-div" class="'); if ($nav_right_set == 0) { echo('nav-right'); $nav_right_set = 1; } echo(' nav-div">
+                    <a id="assets" class="nav-v-c nav-trans" style="padding-left:6px;padding-right:6px;align-items:center;display:flex;height:100%;color:'.$current_banner_text_color.' !important;'); if ($highlight == $n) { echo('text-decoration: underline !important;'); }  echo('" href="./assets.php">Assets</a>
+                </div> 
+                ');
             }
             if (isset($loggedin_role)) {
                 $n = 4;
@@ -138,12 +136,15 @@
     if (isset($profile_name)) {
         echo('
         <div style="width:100%">
-            <div class="nav-div float-right nav-float" style="min-width:120px;">
+            <div class="nav-div float-right nav-float" style="width:120px;">
                 <ul class="nav-links align-middle" style="max-width:max-content; padding-left: 30px; padding-right:30px">');
-                    if (in_array($loggedin_role, $config_admin_roles_array)) { echo('<li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-wrench"></i></span><a class="clickable link" style="margin-left:5px" href="./admin.php"'); if ($highlight == 5) { echo(' style="text-decoration: underline !important;"'); } echo('>Admin</a></li>'); }
+                    if (in_array($loggedin_role, $config_admin_roles_array)) { 
+                        echo('<li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-wrench"></i></span><a class="clickable link" style="margin-left:5px" href="./admin.php"'); if ($highlight == 5) { echo(' style="text-decoration: underline !important;"'); } echo('>Admin</a></li>
+                                <li class="align-middle text-center divider" style="margin-top:5px;height: 6px;">&nbsp;</li>');
+                    }
                 echo('
-		    <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-star"></i></span><a class="clickable link" style="margin-left:5px" href="./favourites.php"'); if ($highlight == 6) { echo(' style="text-decoration: underline !important;"'); } echo('>Favourites</a></li>
                     <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-user"></i></span><a class="clickable link" style="margin-left:5px" href="./profile.php"'); if ($highlight == 7) { echo(' style="text-decoration: underline !important;"'); } echo('>Profile</a></li>
+                    <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-star"></i></span><a class="clickable link" style="margin-left:5px" href="./favourites.php"'); if ($highlight == 6) { echo(' style="text-decoration: underline !important;"'); } echo('>Favourites</a></li>
                     <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-right-from-bracket"></i></span><a class="clickable link" style="margin-left:5px" href="./logout.php">Logout</a></li>
                 </ul>
             </div>
@@ -180,16 +181,14 @@
                         <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-boxes-stacked"></i></span><a href="./"'); if ($highlight == 1) { echo(' style="text-decoration: underline !important;"'); } echo('>Stock</a></li>
                         <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-ethernet"></i></span><a href="./cablestock.php"'); if ($highlight == 2) { echo(' style="text-decoration: underline !important;"'); } echo('>Cables</a></li>');
                         if (isset($loggedin_role)) {
-                            if (in_array($loggedin_role, $config_optics_roles_array)) {
-                                echo('<li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-wave-square"></i></span><a href="./optics.php"'); if ($highlight == 3) { echo(' style="text-decoration: underline !important;"'); } echo('>Optics</a></li>');
-                            }
+                            echo('<li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-wave-square"></i></span><a href="./assets.php"'); if ($highlight == 3) { echo(' style="text-decoration: underline !important;"'); } echo('>Assets</a></li>');
                         }
                         echo('
                         <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-box-open"></i></span><a href="./containers.php"'); if ($highlight == 4) { echo(' style="text-decoration: underline !important;"'); } echo('>Containers</a></li>
                         <li class="align-middle text-center divider" style="margin-top:5px;height: 6px;">&nbsp</li>
-			<li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-star"></i></span><a href="./favourites.php"'); if ($highlight == 6) { echo(' style="text-decoration: underline !important;"'); } echo('>Favourites</a></li>
-                        <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-user"></i></span><a href="./profile.php"'); if ($highlight == 7) { echo(' style="text-decoration: underline !important;"'); } echo('>Profile</a></li>');
-                        echo('<li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-right-from-bracket"></i></span><a href="./logout.php">Logout</a></li>
+			            <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-user"></i></span><a href="./profile.php"'); if ($highlight == 7) { echo(' style="text-decoration: underline !important;"'); } echo('>Profile</a></li>
+                        <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-star"></i></span><a href="./favourites.php"'); if ($highlight == 6) { echo(' style="text-decoration: underline !important;"'); } echo('>Favourites</a></li>
+                        <li><span class="text-center" style="display:inline-block;width:25px"><i class="fa-solid fa-right-from-bracket"></i></span><a href="./logout.php">Logout</a></li>
                     </ul>
                     ');
             }

@@ -74,9 +74,14 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                             <h2 class="header-small" style="padding-bottom:5px">Transactions - <a class="link" href="../stock.php?stock_id='.$_GET['stock_id'].'">'.$stock_name.'</a> - Stock ID: '.$_GET['stock_id']); if ($stock_is_cable == 1) { echo(' (cable)'); } echo('</h2>
                             </div>');
 
+                        // Pagination variables
+                        $results_per_page = 100;
+                        $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+                        $start_index = ($current_page - 1) * $results_per_page;
+                        
                         if ($stock_is_cable !== 1) { // normal stock
 
-                            $sql_tran = "SELECT t.id AS t_id, t.stock_id AS t_stock_id, t.item_id AS t_item_id, t.type AS t_type, t.quantity AS t_quantity,
+                            $sql_tran_init = "SELECT t.id AS t_id, t.stock_id AS t_stock_id, t.item_id AS t_item_id, t.type AS t_type, t.quantity AS t_quantity,
                                                 t.price AS t_price, t.serial_number AS t_serial_number, t.reason AS t_reason, t.comments AS t_comments,
                                             t.date AS t_date, t.time AS t_time, t.username as t_username,
                                             s.name AS s_name, a.name AS a_name
@@ -86,11 +91,13 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                                         LEFT JOIN area AS a ON s.area_id=a.id
                                         WHERE t.stock_id=?
                                         ORDER BY t_date DESC , t_time DESC, t_quantity DESC";
+                            $sql_tran_add = " LIMIT ?, ?";
+                            $sql_tran = $sql_tran_init.$sql_tran_add;
                             $stmt_tran = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($stmt_tran, $sql_tran)) {
                                 echo("ERROR getting entries");
                             } else {
-                                mysqli_stmt_bind_param($stmt_tran, "s", $stock_id);
+                                mysqli_stmt_bind_param($stmt_tran, "sii", $stock_id, $start_index, $results_per_page);
                                 mysqli_stmt_execute($stmt_tran);
                                 $result_tran = mysqli_stmt_get_result($stmt_tran);
                                 $rowCount_tran = $result_tran->num_rows;
@@ -176,13 +183,14 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                                             ');
 
                                     }
+                                    
                                     echo('</tbody>
                                     </table>');
                                 } 
                             }
                         } elseif ($stock_is_cable == 1) { // cable stock
 
-                            $sql_tran = "SELECT t.id AS t_id, t.stock_id AS t_stock_id, t.item_id AS t_item_id, t.type AS t_type, t.quantity AS t_quantity,
+                            $sql_tran_init = "SELECT t.id AS t_id, t.stock_id AS t_stock_id, t.item_id AS t_item_id, t.type AS t_type, t.quantity AS t_quantity,
                                                 t.reason AS t_reason,
                                             t.date AS t_date, t.time AS t_time, t.username as t_username,
                                             s.name AS s_name, a.name AS a_name
@@ -192,11 +200,13 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                                         LEFT JOIN area AS a ON s.area_id=a.id
                                         WHERE t.stock_id=?
                                         ORDER BY t_date DESC , t_time DESC, t_quantity DESC";
+                            $sql_tran_add = " LIMIT ?, ?";
+                            $sql_tran = $sql_tran_init.$sql_tran_add;
                             $stmt_tran = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($stmt_tran, $sql_tran)) {
                                 echo("ERROR getting entries");
                             } else {
-                                mysqli_stmt_bind_param($stmt_tran, "s", $stock_id);
+                                mysqli_stmt_bind_param($stmt_tran, "sii", $stock_id, $start_index, $results_per_page);
                                 mysqli_stmt_execute($stmt_tran);
                                 $result_tran = mysqli_stmt_get_result($stmt_tran);
                                 $rowCount_tran = $result_tran->num_rows;
@@ -273,6 +283,73 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                                     </table>');
                                 } 
                             }       
+                        }
+
+                        $stmt_count = mysqli_stmt_init($conn);
+                        if (mysqli_stmt_prepare($stmt_count, $sql_tran_init)) {
+                            mysqli_stmt_bind_param($stmt_count, "s", $stock_id);
+                            mysqli_stmt_execute($stmt_count);
+                            $result_count = mysqli_stmt_get_result($stmt_count);
+                            $row_count = $result_count->num_rows;
+                            $total_pages = ceil($row_count / $results_per_page);
+                            
+                            if ( $total_pages > 1 && $total_pages <= 15){
+                                echo '<div class="container" style="text-align: center;">';
+                                if ($current_page > 1) {
+                                    echo '<or class="gold clickable" style="padding-right:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.($current_page - 1).'\') + \'\')"><</or>';
+                                }
+                                if ($total_pages > 5) {
+                                    for ($i = 1; $i <= $total_pages; $i++) {
+                                        if ($i == $current_page) {
+                                            echo '<span class="current-page pageSelected" style="padding-right:2px;padding-left:2px">' . $i . '</span>';
+                                            // onclick="navPage(updateQueryParameter(\'\', \'page\', \'$i\'))"
+                                        } elseif ($i == 1 && $current_page > 5) {
+                                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or><or style="padding-left:5px;padding-right:5px">...</or>';  
+                                        } elseif ($i < $current_page && $i >= $current_page-2) {
+                                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';
+                                        } elseif ($i > $current_page && $i <= $current_page+2) {
+                                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';
+                                        } elseif ($i == $total_pages) {
+                                            echo '<or style="padding-left:5px;padding-right:5px">...</or><or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';  
+                                        }
+                                    }
+                                } else {
+                                    for ($i = 1; $i <= $total_pages; $i++) {
+                                        if ($i == $current_page) {
+                                            echo '<span class="current-page pageSelected" style="padding-right:2px;padding-left:2px">' . $i . '</span>';
+                                            // onclick="navPage(updateQueryParameter(\'\', \'page\', \'$i\'))"
+                                        } else {
+                                            echo '<or class="gold clickable" style="padding-right:2px;padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.$i.'\') + \'\')">'.$i.'</or>';
+                                        }
+                                    }
+                                }
+                            
+                                if ($current_page < $total_pages) {
+                                    echo '<or class="gold clickable" style="padding-left:2px" onclick="navPage(updateQueryParameter(\'\', \'page\', \''.($current_page + 1).'\') + \'\')">></or>';
+                                }  
+                                echo '</div>';
+                            } else {
+                                echo ('
+                                <div class="container" style="text-align: center;">
+                                    <form style="margin-bottom:0px">
+                                        <table class="centertable">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding-right:10px">Page:</td>
+                                                    <td style="padding-right:10px">
+                                                        <select id="page-select" class="form-control row-dropdown" style="width:50px;height:25px; padding:0px" onchange="navPage(updateQueryParameter(\'\', \'page\', document.getElementById(\'page-select\').value + \'#transactions\'))" name="page">');
+                                                        for ($i = 1; $i <= $total_pages; $i++) {
+                                                            echo('<option value="'.$i.'"'); if ($i == $current_page) { echo(' selected'); } echo('>'.$i.'</option>');
+                                                        }
+                                                        echo('
+                                                        </select>
+                                                    </td>
+                                            </tbody>
+                                        </table>        
+                                    </form>
+                                </div>
+                                ');
+                            }
                         }
                     }
                 }

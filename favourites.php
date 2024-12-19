@@ -120,7 +120,7 @@ include 'session.php'; // Session setup and redirect if the session is not activ
                         <tr id="stock-'.$stock_id.'">
                             <td class="text-center align-middle">'); if ($stock_img !== '' && $stock_id !== null) { echo('<img id="image-'.$stock_id.'" class="inv-img-main thumb" style="cursor:default !important" src="'.$img_folder.$stock_img.'">'); } echo('</td>
                             <td class="text-center align-middle">'.$stock_id.'</td>
-                            <td id="stock-'.$stock_id.'-name" class="text-center align-middle" style="width:300px">'.$stock_name.'</td>
+                            <td id="stock-'.$stock_id.'-name" class="text-center align-middle" style="width:300px"><a href="stock.php?stock_id='.$stock_id.'">'.$stock_name.'</a></td>
                             <td class="text-center align-middle">'.$stock_sku.'</td>
                             <td class="text-center align-middle">');
                             for ($i = 0; $i < count($stock_area_ids_array); $i++) {
